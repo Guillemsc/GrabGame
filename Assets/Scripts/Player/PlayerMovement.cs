@@ -91,10 +91,12 @@ public class PlayerMovement : MonoBehaviour
             input.x += 1;
 
         if (Input.GetKeyDown("w"))
-            input.y += 1;
-        
+            input.y = 1;
+        else if(Input.GetKey("w"))
+            input.y = 2;
+
         if (Input.GetKeyDown("s"))
-            input.y -= 1;
+            input.y = -1;
     }
 
     private void MovePlayerLeftRight()
@@ -182,7 +184,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (allow_jump_after_ground_detection_jump_timer.ReadTime() > allow_jump_after_ground_detection_time_sec)
             {
-                if (input.y > 0)
+                if (input.y == 1)
                 {
                     if (player_sensors.GetTouchingPlatform())
                     {
@@ -190,6 +192,8 @@ public class PlayerMovement : MonoBehaviour
 
                         rigid_body.velocity = new Vector2(rigid_body.velocity.x, 0);
                         rigid_body.AddForce(Vector2.up * y_jump_force);
+
+                        normal_jumping = true;
 
                         next_jump_timer.Start();
                     }
@@ -209,19 +213,23 @@ public class PlayerMovement : MonoBehaviour
 
                         next_jump_timer.Start();
                     }
-                }
-                else
-                {
-                    if (player_sensors.GetTouchingPlatform())
-                        player_state = PlayerState.PLAYER_STATE_GROUNDED;
-                }  
+                }   
+            }
+        }
+
+        if (input.y <= 0)
+        {
+            if (normal_jumping)
+            {                
+                rigid_body.AddForce(Vector2.down * y_jump_force * 0.05f);
+                Debug.Log("Down");
             }
         }
     }
 
     private void PlayerGoThroughPlatforms()
     {
-        if (input.y < 0)
+        if (input.y == -1)
         {
             if (player_sensors.GetTouchingPlatform())
             {
@@ -282,11 +290,17 @@ public class PlayerMovement : MonoBehaviour
         {
             rigid_body.velocity = new Vector2(rigid_body.velocity.x, 0);
         }
+
+        normal_jumping = false;
     }
 
     private void OnPlatformStartTouching(GameObject go)
     {
         allow_jump_after_ground_detection_jump_timer.Start();
+
+        player_state = PlayerState.PLAYER_STATE_GROUNDED;
+
+        normal_jumping = false;
     }
 
     private void OnPlatformStopTouching(GameObject go)
@@ -310,6 +324,11 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 GetRigidBodyVelocity()
     {
         return rigid_body.velocity;
+    }
+
+    public void SetNormalJumpToFalse()
+    {
+        normal_jumping = false;
     }
 
     private bool movement_enabled = true;
@@ -360,6 +379,8 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerSensors player_sensors = null;
     private Rigidbody2D rigid_body = null;
+
+    private bool normal_jumping = false;
 
     private Timer next_jump_timer = new Timer();
     private Timer allow_jump_after_ground_detection_jump_timer = new Timer();

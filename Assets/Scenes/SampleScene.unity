@@ -323,7 +323,7 @@ MonoBehaviour:
   max_run_velocity: 2.6
   x_run_acceleration: 25
   x_run_deceleration: 30
-  y_jump_force: 490
+  y_jump_force: 500
   y_jump_multiplier_on_wall: 1.1
   x_jump_multiplier_on_wall: 0.5
   x_jump_acceleration: 5
@@ -4215,6 +4215,7 @@ MonoBehaviour:
   weapon_head_rotation_point: {fileID: 427854650}
   shooting_speed: 10
   grabbed_up_down_speed: 2
+  grabbed_end_force: 100
   grabbed_x_acceleration: 10
   max_grabbed_x_velocity: 5
   recovering_towards_weapon_speed: 9

@@ -70,7 +70,7 @@ public class PlayerWeaponController : MonoBehaviour
             }
             else
             {
-                StopGrab();
+                StopGrab(true);
                 StopWeaponShoot();
                 StopRecoverintTowardsWeapon();
             }
@@ -87,6 +87,8 @@ public class PlayerWeaponController : MonoBehaviour
         if(!shooting)
         {
             starting_head_pos = weapon_head_rotation_point.transform.localPosition;
+
+            player_movement.SetNormalJumpToFalse();
 
             shooting = true;
         }
@@ -193,11 +195,13 @@ public class PlayerWeaponController : MonoBehaviour
 
             player_movement.SetMovementEnabled(false);
 
+            CameraManager.Instance.CameraStartShake(CameraManager.Instance.GetUsedCamera(), 0.05f, 0.1f);
+
             grabbed = true;
         }
     }
 
-    private void StopGrab()
+    private void StopGrab(bool use_boost = false)
     {
         if (distance_joint != null)
         {
@@ -210,7 +214,10 @@ public class PlayerWeaponController : MonoBehaviour
 
         PlatformManager.Instance.EnableCollisions(player_sensors.GetBodyCollider());
 
-        player_movement.SetMovementEnabled(true); 
+        player_movement.SetMovementEnabled(true);
+
+        if(use_boost)
+            rigid_body.AddForce(Vector2.up * grabbed_end_force);
 
         grabbed = false;
     }
@@ -244,19 +251,23 @@ public class PlayerWeaponController : MonoBehaviour
                 {
                     StopGrab();
                     StopWeaponShoot();
-                    StopRecoverintTowardsWeapon();
+                    StopRecoverintTowardsWeapon(true);
                 }
             }
         }
     }
 
-    private void StopRecoverintTowardsWeapon()
+    private void StopRecoverintTowardsWeapon(bool use_boost = false)
     {
         recovering_towards_weapon = false;
 
         float distance_recovered = recovered_start_distance - recovered_curr_distance;
 
-        rigid_body.AddForce(Vector2.up * recover_end_force);
+        if (use_boost)
+        {
+            rigid_body.velocity = new Vector2(0, 0);
+            rigid_body.AddForce(Vector2.up * recover_end_force);
+        }
     }
 
     private void OnHeadTriggerEnter(Collider2D coll)
@@ -297,6 +308,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     [SerializeField]
     private float grabbed_up_down_speed = 0;
+
+    [SerializeField]
+    private float grabbed_end_force = 0;
 
     [SerializeField]
     private float grabbed_x_acceleration = 0;
