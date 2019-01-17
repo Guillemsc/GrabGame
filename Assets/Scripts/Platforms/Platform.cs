@@ -18,6 +18,11 @@ public class Platform : MonoBehaviour
             PlatformManager.Instance.RemovePlatform(this);
     }
 
+    public bool GetDisableOnGrabbed()
+    {
+        return disable_on_grabbed;
+    }
+
     public bool GetUsable()
     {
         return edge_collider.enabled;
@@ -37,4 +42,5 @@ public class Platform : MonoBehaviour
     private Collider2D base_collider = null;
 
     [SerializeField] private bool can_go_down = true;
+    [SerializeField] private bool disable_on_grabbed = false;
 }

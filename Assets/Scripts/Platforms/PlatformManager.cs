@@ -27,7 +27,10 @@ public class PlatformManager : Singleton<PlatformManager>
         {
             for(int i = 0; i < platforms.Count; ++i)
             {
-                Physics2D.IgnoreCollision(coll, platforms[i].GetCollider());
+                Platform curr_platform = platforms[i];
+
+                if(curr_platform.GetDisableOnGrabbed())
+                    Physics2D.IgnoreCollision(coll, curr_platform.GetCollider());
             }
         }
     }
@@ -38,7 +41,10 @@ public class PlatformManager : Singleton<PlatformManager>
         {
             for (int i = 0; i < platforms.Count; ++i)
             {
-                Physics2D.IgnoreCollision(coll, platforms[i].GetCollider(), false);
+                Platform curr_platform = platforms[i];
+
+                if (curr_platform.GetDisableOnGrabbed())
+                    Physics2D.IgnoreCollision(coll, curr_platform.GetCollider(), false);
             }
         }
     }

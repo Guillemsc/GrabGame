@@ -332,7 +332,7 @@ public class PlayerSensors : MonoBehaviour
 
     private Rigidbody2D rigid_body = null;
 
-    private float platform_detectors_lenght_check = 0.1f;
+    private readonly float platform_detectors_lenght_check = 0.1f;
 
     private bool touching_platform = true;
     private bool touching_wall_left = false;

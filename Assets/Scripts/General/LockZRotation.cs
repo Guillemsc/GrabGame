@@ -6,10 +6,11 @@ public class LockZRotation : MonoBehaviour
 {
 	void Update ()
     {
-        if(enabled)
-            gameObject.transform.eulerAngles = new Vector3(0, 0, 0);
+        if(lock_enabled)
+            gameObject.transform.eulerAngles 
+                = new Vector3(gameObject.transform.eulerAngles.x, gameObject.transform.eulerAngles.y, 0);
 	}
 
     [SerializeField]
-    private bool enabled = true;
+    private bool lock_enabled = true;
 }

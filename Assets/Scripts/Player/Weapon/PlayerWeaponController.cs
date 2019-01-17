@@ -44,8 +44,8 @@ public class PlayerWeaponController : MonoBehaviour
         player_movement = gameObject.GetComponentInParent<PlayerMovement>();
 
         player_sensors = gameObject.GetComponentInParent<PlayerSensors>();
-        player_sensors.SuscribeToOnPlatformStartTouching(OnPlatformStartTouching);
 
+        SetClosedHead();
     }
 
     private void WeaponMouseRotation()
@@ -88,6 +88,8 @@ public class PlayerWeaponController : MonoBehaviour
         {
             starting_head_pos = weapon_head_rotation_point.transform.localPosition;
 
+            SetOpenedHead();
+
             player_movement.SetNormalJumpToFalse();
 
             shooting = true;
@@ -101,12 +103,24 @@ public class PlayerWeaponController : MonoBehaviour
             float dt_shooting_speed = shooting_speed * Time.deltaTime;
 
             weapon_head_rotation_point.transform.localPosition += new Vector3(dt_shooting_speed, 0, 0);
+
+            CheckSpawnTrail();
+
+            float distance = Vector2.Distance(weapon_head_rotation_point.transform.position, gameObject.transform.position);
+
+            if(Mathf.Abs(distance) > max_shoot_distance)
+            {
+                StopWeaponShoot();
+            }
         }
     }
 
     private void StopWeaponShoot()
     {
         weapon_head_rotation_point.transform.localPosition = starting_head_pos;
+
+        SetClosedHead();
+        DeleteTrial();
 
         shooting = false;
     }
@@ -120,6 +134,8 @@ public class PlayerWeaponController : MonoBehaviour
             float angle = Utils.AngleFromTwoPoints(weapon_head_rotation_point.transform.position, gameObject.transform.position);
             weapon_head_rotation_point.transform.eulerAngles = new Vector3(0, 0, angle + 180);
             rotation_point.transform.eulerAngles = new Vector3(0, 0, angle + 180);
+
+            AdjustTrailDistance();
         }
     }
 
@@ -153,6 +169,9 @@ public class PlayerWeaponController : MonoBehaviour
                     float dt_grabbed_up_down_speed = grabbed_up_down_speed * Time.deltaTime;
                     distance_joint.distance += dt_grabbed_up_down_speed;
                 }
+
+                if (distance_joint.distance > max_shoot_distance)
+                    distance_joint.distance = max_shoot_distance;
 
                 float dt_grabbed_x_acceleration = grabbed_x_acceleration * Time.deltaTime;
 
@@ -191,6 +210,10 @@ public class PlayerWeaponController : MonoBehaviour
             distance_joint.connectedAnchor = grabbed_point;
             distance_joint.enableCollision = true;
 
+            trails_starting_distance = distance_joint.distance;
+
+            SetClosedHead();
+
             PlatformManager.Instance.DisableCollisions(player_sensors.GetBodyCollider());
 
             player_movement.SetMovementEnabled(false);
@@ -212,11 +235,13 @@ public class PlayerWeaponController : MonoBehaviour
 
         weapon_head_rotation_point.transform.parent = rotation_point.transform;
 
+        DeleteTrial();
+
         PlatformManager.Instance.EnableCollisions(player_sensors.GetBodyCollider());
 
         player_movement.SetMovementEnabled(true);
 
-        if(use_boost)
+        if(use_boost && grabbed)
             rigid_body.AddForce(Vector2.up * grabbed_end_force);
 
         grabbed = false;
@@ -270,6 +295,112 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
 
+    private void SpawnTrail(float distance)
+    {
+        SpawnedTrail st = new SpawnedTrail();
+
+        st.go = new GameObject();
+        st.go.transform.parent = trails_parent.transform;
+        st.go.transform.localPosition = new Vector3(-distance, 0, 0);
+        st.go.transform.localEulerAngles = new Vector3(0, 0, 0);
+        st.go.name = "Trail:" + spawned_trails.Count;
+        SpriteRenderer sr = st.go.AddComponent<SpriteRenderer>();
+        sr.sprite = weapon_trail_sprite;
+
+        st.distance_from_player = distance;
+        st.distance_from_weapon_head = Vector2.Distance(st.go.transform.position, weapon_head.transform.position);
+
+        spawned_trails.Add(st);
+    }
+
+    private void CheckSpawnTrail()
+    {
+        if(shooting && !grabbed)
+        {
+            bool spawn = false;
+            bool fist = false;
+            float distance_spawn = 0;
+
+            if(spawned_trails.Count == 0)
+            {
+                distance_spawn = 0.2f;
+
+                spawn = true;
+                fist = true;
+            }
+            else
+            {
+                SpawnedTrail last_trail = spawned_trails[spawned_trails.Count - 1];
+
+                float distance = Vector2.Distance(last_trail.go.transform.position, 
+                    trail_spawn_pos.transform.position);
+
+                if(distance >= trails_spawn_distance)
+                {
+                    distance_spawn = last_trail.distance_from_player + trails_spawn_distance;
+
+                    spawn = true;
+                }
+            }
+
+            if(fist)
+            {
+                trails_parent = new GameObject();
+                trails_parent.name = "TrailsParent";
+                trails_parent.transform.parent = weapon_head.transform;
+                trails_parent.transform.localEulerAngles = new Vector3(0, 0, 0);
+                trails_parent.transform.localPosition = new Vector3(0, 0.025f, 0);
+            }
+
+            if (spawn)
+            {
+                SpawnTrail(distance_spawn);
+            }
+        }
+    }
+
+    private void AdjustTrailDistance()
+    {
+        if (shooting && grabbed)
+        {
+            float distance = Vector2.Distance(trail_spawn_pos.transform.position, weapon_head.transform.position);
+
+            float position_offset = distance_joint.distance - trails_starting_distance;
+
+            float max_distance = 0;
+
+            for (int i = 0; i < spawned_trails.Count;)
+            {
+                SpawnedTrail curr_trail = spawned_trails[i];
+
+                if (max_distance < curr_trail.distance_from_weapon_head)
+                    max_distance = curr_trail.distance_from_weapon_head;
+
+                if (distance < curr_trail.distance_from_weapon_head)
+                {
+                    Destroy(curr_trail.go);
+                    spawned_trails.RemoveAt(i);
+                }
+                else
+                    ++i;
+            }
+            
+            while(distance - trails_spawn_distance > max_distance)
+            {
+                max_distance += trails_spawn_distance;
+
+                SpawnTrail(max_distance);
+            }
+        }
+    }
+
+    private void DeleteTrial()
+    {
+        Destroy(trails_parent);
+        trails_parent = null;
+        spawned_trails.Clear();
+    }
+
     private void OnHeadTriggerEnter(Collider2D coll)
     {
         if (!grabbed)
@@ -283,13 +414,47 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
 
-    private void OnPlatformStartTouching(GameObject go)
+    private void SetClosedHead()
     {
-        if(!player_movement.GetMovementEnabled() && !grabbed)
-        {
-            player_movement.SetMovementEnabled(true);
-        }
+        head_sprite_renderer.sprite = weapon_head_closed_sprite;
     }
+
+    private void SetOpenedHead()
+    {
+        head_sprite_renderer.sprite = weapon_head_opened_sprite;
+    }
+
+    public bool GetShooting()
+    {
+        return shooting;
+    }
+
+    public bool GetGrabbed()
+    {
+        return grabbed;
+    }
+
+    public class SpawnedTrail
+    {
+        public GameObject go = null;
+        public float distance_from_player = 0.0f;
+        public float distance_from_weapon_head = 0.0f;
+    }
+
+    [SerializeField]
+    private Sprite weapon_head_closed_sprite = null;
+
+    [SerializeField]
+    private Sprite weapon_head_opened_sprite = null;
+
+    [SerializeField]
+    private Sprite weapon_trail_sprite = null;
+
+    [SerializeField]
+    private GameObject trail_spawn_pos = null;
+
+    [SerializeField]
+    private SpriteRenderer head_sprite_renderer = null;
 
     [SerializeField]
     private GameObject rotation_point = null;
@@ -302,6 +467,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     [SerializeField]
     private GameObject weapon_head_rotation_point = null;
+
+    [SerializeField]
+    private float max_shoot_distance = 0;
 
     [SerializeField]
     private float shooting_speed = 0;
@@ -324,6 +492,9 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField]
     private float recover_end_force = 0;
 
+    [SerializeField]
+    private float trails_spawn_distance = 0;
+
     private PlayerMovement player_movement = null;
     private PlayerSensors player_sensors = null;
     private Rigidbody2D rigid_body = null;
@@ -338,4 +509,8 @@ public class PlayerWeaponController : MonoBehaviour
     private bool recovering_towards_weapon = false;
     private float recovered_start_distance = 0;
     private float recovered_curr_distance = 0;
+
+    private List<SpawnedTrail> spawned_trails = new List<SpawnedTrail>();
+    private GameObject trails_parent = null;
+    private float trails_starting_distance = 0;
 }

@@ -221,8 +221,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (normal_jumping)
             {                
-                rigid_body.AddForce(Vector2.down * y_jump_force * 0.05f);
-                Debug.Log("Down");
+                rigid_body.AddForce(Vector2.down * y_jump_force * x_jump_multiplier_on_not_pressing);
             }
         }
     }
@@ -350,6 +349,9 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField]
     private float x_jump_multiplier_on_wall = 0.0f;
+
+    [SerializeField]
+    private float x_jump_multiplier_on_not_pressing = 0.0f;
 
     [SerializeField]
     private float x_jump_acceleration = 0.0f;

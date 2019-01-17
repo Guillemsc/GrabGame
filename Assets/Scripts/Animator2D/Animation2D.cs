@@ -85,6 +85,6 @@ public class Animation2D
     [SerializeField] [HideInInspector]
     private List<Sprite> sprites = new List<Sprite>();
 
-    [SerializeField]
+    [SerializeField] [HideInInspector]
     private Vector2 offset = Vector2.zero;
 }
