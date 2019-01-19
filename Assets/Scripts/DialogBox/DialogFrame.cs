@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+public delegate void DelDialogFrame(DialogFrame ev);
+
 public class DialogFrame
 {
     public DialogFrame(TextMeshProUGUI text_to_use, string dialog)
@@ -65,8 +67,21 @@ public class DialogFrame
         text_to_use.text = "";
     }
 
+    public void SuscribeToOnFrameFinish(DelDialogFrame callback)
+    {
+        on_frame_finish += callback;
+    }
+
+    public void CallOnFrameFinish()
+    {
+        if (on_frame_finish != null)
+            on_frame_finish(this);
+    }
+
     private TextMeshProUGUI text_to_use = null;
     private string full_dialog = "";
     private int lines = 0;
     private List<string> text_per_line = new List<string>();
+
+    private DelDialogFrame on_frame_finish = null;
 }

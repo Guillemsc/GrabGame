@@ -7,8 +7,55 @@
 // c = total_value
 // d = total_duration
 
+public enum EasingFunctionsType
+{
+    LINEAR,
+    EXPO_IN,
+    EXPO_OUT,
+    EXPO_IN_OUT,
+    BOUNCE,
+    QUAD_IN,
+    QUAD_OUT,
+    QUAD_IN_OUT,
+}
+
 public class EasingFunctions
 {
+    public static float GetEasing(EasingFunctionsType type, float total_value, float current_time, float starting_value, float total_duration)
+    {
+        float ret = 0.0f;
+
+        switch(type)
+        {
+            case EasingFunctionsType.LINEAR:
+                ret = Linear(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.EXPO_IN:
+                ret = ExpoIn(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.EXPO_OUT:
+                ret = ExpoOut(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.EXPO_IN_OUT:
+                ret = ExpoInOut(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.BOUNCE:
+                ret = Bounce(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.QUAD_IN:
+                ret = QuadIn(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.QUAD_OUT:
+                ret = QuadOut(total_value, current_time, starting_value, total_duration);
+                break;
+            case EasingFunctionsType.QUAD_IN_OUT:
+                ret = QuadInOut(total_value, current_time, starting_value, total_duration);
+                break;
+        }
+
+        return ret;
+    }
+
     public static float Linear(float total_value, float current_time, float starting_value, float total_duration)
     {
         return total_value * current_time / total_duration + starting_value;

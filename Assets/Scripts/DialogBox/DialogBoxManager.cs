@@ -9,39 +9,23 @@ public class DialogBoxManager : Singleton<DialogBoxManager>
     {
         InitInstance(this);
     }
-
-    // Use this for initialization
-    void Start ()
-    {
-        AddDialogText(tmp_text, "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry.");
-        AddDialogText(tmp_text, "This is the second text i'm testing");
-
-        PushCurrentDialog();
-    }
 	
 	// Update is called once per frame
 	void Update ()
     {
         UpdateCurrentDialog();
-
-        if (Input.GetKey("a"))
-            PushNextBox();
-
-        if (Input.GetKeyDown("d"))
-        {
-            AddDialogText(tmp_text, "Lorem Ipsum is simply dummy text of the printing and typesetting in, This is the second text i'm testing");
-
-            PushCurrentDialog();
-        }
     }
 
-    public void AddDialogText(TextMeshProUGUI text_to_use, string text)
+    public void AddDialogText(TextMeshProUGUI text_to_use, string text, DelDialogFrame on_finish_callback = null)
     {
         if(text != "" && text_to_use != null)
         {
             text_to_use.text = "";
 
             DialogFrame df = new DialogFrame(text_to_use, text);
+
+            if (on_finish_callback != null)
+                df.SuscribeToOnFrameFinish(on_finish_callback);
 
             dialog_frames_to_add.Add(df);
         }
@@ -130,6 +114,9 @@ public class DialogBoxManager : Singleton<DialogBoxManager>
                     {
                         curr_line_printing = 0;
                         curr_word_printing = 0;
+
+                        curr_frame.CallOnFrameFinish();
+
                         ++curr_frame_printing;
                     }
                 }
@@ -140,39 +127,6 @@ public class DialogBoxManager : Singleton<DialogBoxManager>
             }
         }
     }
-
-    //private void StartPrintingText()
-    //{
-    //    if (texts_to_print.Count > 0)
-    //    {
-    //        current_text_printing = texts_to_print[0];
-    //        curr_word_printing = 0;
-    //        print_text = true;
-    //    }
-    //}
-
-    //private void UpdatePrintingText()
-    //{
-    //    if(print_text)
-    //    {
-    //        if(current_text_printing != "")
-    //        {
-    //            if (curr_word_printing < current_text_printing.Length)
-    //            {
-    //                string text_to_print = text_to_use.text;                
-                    
-    //                if(printing_leter_timer.ReadTime() > printing_leter_time || curr_word_printing == 0)
-    //                {
-    //                    printing_leter_timer.Start();
-
-    //                    text_to_print += current_text_printing[curr_word_printing++];
-    //                }
-
-    //                text_to_use.text = text_to_print;
-    //            }
-    //        }
-    //    }
-    //}
 
     [SerializeField]
     TextMeshProUGUI tmp_text = null;
