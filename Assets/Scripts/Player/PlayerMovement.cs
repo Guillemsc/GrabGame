@@ -220,8 +220,9 @@ public class PlayerMovement : MonoBehaviour
         if (input.y <= 0)
         {
             if (normal_jumping)
-            {                
-                rigid_body.AddForce(Vector2.down * y_jump_force * x_jump_multiplier_on_not_pressing);
+            {
+                float dt_x_jump_multiplier_on_not_pressing = x_jump_multiplier_on_not_pressing * Time.deltaTime;
+                rigid_body.AddForce(Vector2.down * y_jump_force * dt_x_jump_multiplier_on_not_pressing);
             }
         }
     }
