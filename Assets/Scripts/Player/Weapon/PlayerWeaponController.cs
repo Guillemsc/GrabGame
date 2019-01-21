@@ -493,6 +493,9 @@ public class PlayerWeaponController : MonoBehaviour
     private float recover_end_force = 0;
 
     [SerializeField]
+    private float recovering_towards_player_speed = 0;
+
+    [SerializeField]
     private float trails_spawn_distance = 0;
 
     private PlayerMovement player_movement = null;
@@ -509,6 +512,8 @@ public class PlayerWeaponController : MonoBehaviour
     private bool recovering_towards_weapon = false;
     private float recovered_start_distance = 0;
     private float recovered_curr_distance = 0;
+
+    private bool recovering_towards_player = false;
 
     private List<SpawnedTrail> spawned_trails = new List<SpawnedTrail>();
     private GameObject trails_parent = null;

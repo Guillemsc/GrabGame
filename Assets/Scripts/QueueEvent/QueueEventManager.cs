@@ -9,96 +9,31 @@ public class QueueEventManager : Singleton<QueueEventManager>
         InitInstance(this);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        UpdateEvents();
+        UpdateContexts();
     }
 
-    public void PushEvent(QueueEvent ev, bool start_with_last = false)
+    public QueueEventContext CreateContext()
     {
-        if(ev != null)
-        {
-            if(start_with_last)
-                ev.PushWithLastEvent();
+        QueueEventContext qe = new QueueEventContext();
 
-            events_to_push.Add(ev);
-        }
+        contexts.Add(qe);
+
+        return qe;
     }
 
-    public void LastPushedEventOnStart(DelQueueEvent callback)
+    public void RemoveContext(QueueEventContext context)
     {
-        if (events_to_push.Count > 0)
-        {
-            events_to_push[events_to_push.Count].SuscribeToOnEventStart(callback);
-        }
+        if (context != null)
+            contexts.Remove(context);
     }
 
-    public void LastPushedEventOnFinish(DelQueueEvent callback)
+    private void UpdateContexts()
     {
-        if(events_to_push.Count > 0)
-        {
-            events_to_push[events_to_push.Count].SuscribeToOnEventFinish(callback);
-        }
+        for(int i = 0; i < contexts.Count; ++i)
+            contexts[i].UpdateEvents();
     }
 
-    public void UpdateEvents()
-    {
-        if(curr_events.Count > 0)
-        {
-            for(int i = 0; i < curr_events.Count;)
-            {
-                QueueEvent curr_event = curr_events[i];
-
-                if(!curr_event.GetFinished())
-                {
-                    curr_event.OnUpdate();
-
-                    ++i;
-                }
-                else
-                {
-                    curr_event.OnFinish();
-
-                    curr_event.CallOnEventFinish();
-
-                    curr_events.RemoveAt(i);
-                }
-            }
-        }
-        else
-        {
-            if(events_to_push.Count > 0)
-            {
-                for(int i = 0; i < events_to_push.Count;)
-                {
-                    QueueEvent curr_event = curr_events[i];
-
-                    bool add = false;
-
-                    if (i == 0)
-                    {
-                        add = true;
-                    }
-                    else if (curr_event.GetPushWithLastEvent())
-                    {
-                        add = true;
-                    }
-
-                    if (add)
-                    {
-                        curr_events.Add(curr_event);
-
-                        events_to_push.RemoveAt(i);
-
-                        curr_event.CallOnEventStart();
-                    }
-                    else
-                        break;
-                }
-            }
-        }
-    }
-
-    List<QueueEvent> events_to_push = new List<QueueEvent>();
-    List<QueueEvent> curr_events = new List<QueueEvent>();
+    private List<QueueEventContext> contexts = new List<QueueEventContext>();
 }

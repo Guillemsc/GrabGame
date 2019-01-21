@@ -7,6 +7,7 @@ public class QueueEventScale : QueueEvent
     public QueueEventScale(GameObject element, Vector3 starting_val, Vector3 ending_val, float scale_time,
         EasingFunctionsType movement_type, bool real_time = false) : base("scale")
     {
+        this.movement_type = movement_type;
         this.affected_element = element;
         this.starting_val = starting_val;
         this.ending_val = ending_val;

@@ -55,29 +55,19 @@ public class CameraManager : Singleton<CameraManager>
         }
     }
 
-    public void CameraFollow(Camera camera, GameObject go, float movement_time, Vector3 offset)
+    public CameraFollowItem CameraFollow(Camera camera, GameObject go, float movement_time, Vector3 offset)
     {
+        CameraFollowItem ret = null;
+
         if (go != null && camera != null)
         {
             CameraStopFollow(camera);
-            
-            CameraFollowItem item = new CameraFollowItem(camera, go, movement_time, offset);
-            following_items.Add(item);
-        }
-    }
 
-    public void CameraUpdateFollow(Camera camera, float movement_time, Vector3 offset)
-    {
-        for (int i = 0; i < following_items.Count; ++i)
-        {
-            CameraFollowItem curr_item = following_items[i];
-
-            if (curr_item.GetCamera() == camera)
-            {
-                curr_item.SetMovementTime(movement_time);
-                curr_item.SetOffset(offset);
-            }
+            ret = new CameraFollowItem(camera, go, movement_time, offset);
+            following_items.Add(ret);
         }
+
+        return ret;
     }
 
     public void CameraStopFollow(Camera camera)
@@ -110,6 +100,22 @@ public class CameraManager : Singleton<CameraManager>
         }
     }
 
+    public void CameraInstantFocus(Camera camera)
+    {
+        for (int i = 0; i < following_items.Count; ++i)
+        {
+            CameraFollowItem curr_item = following_items[i];
+
+            if (camera == curr_item.GetCamera())
+            {
+                Vector3 desired_pos = curr_item.GetDesiredPos();
+                curr_item.GetCamera().transform.position = desired_pos;
+
+                break;
+            }
+        }
+    }
+
     public void CameraStartShake(Camera camera, float shake_duration, float shake_amount)
     {
         for(int i = 0; i < camera_shakes.Count; ++i)
@@ -134,11 +140,9 @@ public class CameraManager : Singleton<CameraManager>
             CameraFollowItem curr_item = following_items[i];
 
             float movement_time = curr_item.GetMovementTime();
-            Vector3 offset = curr_item.GetOffset();
             Camera camera = curr_item.GetCamera();
-            Transform following_trans = curr_item.GetFollowingGameObject().transform;
 
-            Vector3 desired_pos = following_trans.position + offset;
+            Vector3 desired_pos = curr_item.GetDesiredPos();
 
             Vector3 smoothed_position = Vector3.SmoothDamp(camera.transform.position, desired_pos, ref curr_item.velocity, movement_time);
 
@@ -174,6 +178,16 @@ public class CameraManager : Singleton<CameraManager>
             this.offset = offset;
         }
 
+        public void CameraStartShake(float shake_duration, float shake_amount)
+        {
+            CameraManager.Instance.CameraStartShake(camera, shake_duration, shake_duration);
+        }
+
+        public void InstantFocus()
+        {
+            CameraManager.Instance.CameraInstantFocus(camera);
+        }
+
         public GameObject GetFollowingGameObject()
         {
             return to_follow;
@@ -182,6 +196,11 @@ public class CameraManager : Singleton<CameraManager>
         public Camera GetCamera()
         {
             return camera;
+        }
+
+        public Vector3 GetDesiredPos()
+        {
+            return to_follow.transform.position + offset;
         }
 
         public void SetMovementTime(float movement_time)

@@ -10,7 +10,8 @@ public class PlayerAnimationController : MonoBehaviour
         player_movement = gameObject.GetComponentInParent<PlayerMovement>();
         player_sensors = gameObject.GetComponentInParent<PlayerSensors>();
 
-        CameraManager.Instance.CameraFollow(CameraManager.Instance.GetUsedCamera(), gameObject, 0.2f, new Vector3(0, 1));
+        camera_follow_item = CameraManager.Instance.
+            CameraFollow(CameraManager.Instance.GetUsedCamera(), gameObject, 0.2f, new Vector3(0, 1));
     }
 
     private void Update()
@@ -101,4 +102,6 @@ public class PlayerAnimationController : MonoBehaviour
     private Animator2D animator = null;
     private PlayerMovement player_movement = null;
     private PlayerSensors player_sensors = null;
+
+    private CameraManager.CameraFollowItem camera_follow_item = null;
 }

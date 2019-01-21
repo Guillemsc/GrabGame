@@ -7,6 +7,7 @@ public class QueueEventFade : QueueEvent
     public QueueEventFade(GameObject element, float starting_val, float ending_val, float fade_time, 
         EasingFunctionsType movement_type, bool real_time = false) : base("fade")
     {
+        this.movement_type = movement_type;
         this.affected_element = element;
         this.starting_val = starting_val;
         this.ending_val = ending_val;
