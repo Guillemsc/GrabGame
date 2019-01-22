@@ -11,7 +11,14 @@ public class PlayerAnimationController : MonoBehaviour
         player_sensors = gameObject.GetComponentInParent<PlayerSensors>();
 
         camera_follow_item = CameraManager.Instance.
-            CameraFollow(CameraManager.Instance.GetUsedCamera(), gameObject, 0.2f, new Vector3(0, 1));
+            CameraFollow(CameraManager.Instance.GetUsedCamera(), gameObject, 0.2f, new Vector3(0, 0));
+    }
+
+    private void Start()
+    {
+        Level curr_level = LevelManager.Instance.GetCurrLevel();
+        if(curr_level != null)
+            camera_follow_item.SetCameraBounds(curr_level.GetCameraBounds());
     }
 
     private void Update()

@@ -195,9 +195,11 @@ public class PlayerSensors : MonoBehaviour
 
                         if (wall_script != null && !curr_coll.collider.isTrigger)
                         {
-                            found_go = wall_script.gameObject;
-                            found = true;
-
+                            if (wall_script.GetCanWallJump())
+                            {
+                                found_go = wall_script.gameObject;
+                                found = true;
+                            }
                             break;
                         }
                     }
@@ -243,8 +245,11 @@ public class PlayerSensors : MonoBehaviour
 
                         if (wall_script != null)
                         {
-                            found_go = wall_script.gameObject;
-                            found = true;
+                            if (wall_script.GetCanWallJump())
+                            {
+                                found_go = wall_script.gameObject;
+                                found = true;
+                            }
 
                             break;
                         }

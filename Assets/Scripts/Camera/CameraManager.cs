@@ -188,6 +188,14 @@ public class CameraManager : Singleton<CameraManager>
             CameraManager.Instance.CameraInstantFocus(camera);
         }
 
+        public void SetCameraBounds(CameraBounds bounds)
+        {
+            if(bounds != null)
+            {
+                this.bounds = bounds;
+            }
+        }
+
         public GameObject GetFollowingGameObject()
         {
             return to_follow;
@@ -200,7 +208,52 @@ public class CameraManager : Singleton<CameraManager>
 
         public Vector3 GetDesiredPos()
         {
-            return to_follow.transform.position + offset;
+            Vector3 ret = Vector3.zero;
+
+            if (bounds == null)
+            {
+                ret = to_follow.transform.position + offset;
+            }
+            else
+            {
+                Vector3 test_desired_pos = to_follow.transform.position + offset;
+
+                Bounds camera_bounds = GetOrthographicBounds();
+
+                float top_point = bounds.GetTopPoint();
+                float bottom_point = bounds.GetBottomPoint();
+                float right_point = bounds.GetRightPoint();
+                float left_point = bounds.GetLeftPoint();
+
+                float camera_top_point = test_desired_pos.y + (camera_bounds.size.y * 0.5f);
+                float camera_bottom_point = test_desired_pos.y - (camera_bounds.size.y * 0.5f);
+                float camera_right_point = test_desired_pos.x + (camera_bounds.size.x * 0.5f);
+                float camera_left_point = test_desired_pos.x - (camera_bounds.size.x * 0.5f);
+
+                if (top_point < camera_top_point)
+                {
+                    test_desired_pos.y = top_point - (camera_bounds.size.y * 0.5f);
+                }
+
+                if (bottom_point > camera_bottom_point)
+                {
+                    test_desired_pos.y = bottom_point + (camera_bounds.size.y * 0.5f);
+                }
+
+                if (right_point < camera_right_point)
+                {
+                    test_desired_pos.x = right_point - (camera_bounds.size.x * 0.5f);
+                }
+
+                if (left_point > camera_left_point)
+                {
+                    test_desired_pos.x = left_point + (camera_bounds.size.x * 0.5f);
+                }
+
+                ret = test_desired_pos;
+            }
+
+            return ret;
         }
 
         public void SetMovementTime(float movement_time)
@@ -224,10 +277,23 @@ public class CameraManager : Singleton<CameraManager>
             return offset;
         }
 
+        public Bounds GetOrthographicBounds()
+        {
+            float screenAspect = (float)Screen.width / (float)Screen.height;
+
+            float cameraHeight = camera.orthographicSize * 2;
+
+            Bounds bounds = new Bounds(camera.transform.position, new Vector3(cameraHeight * screenAspect, cameraHeight, 0));
+
+            return bounds;
+        }
+
         private Camera camera = null;
         private GameObject to_follow = null;
         private float movement_time = 0.0f;
         private Vector3 offset = Vector3.zero;
+
+        private CameraBounds bounds = null;
 
         public Vector3 velocity = Vector3.zero;
     }

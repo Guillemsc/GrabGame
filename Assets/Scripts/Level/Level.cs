@@ -9,6 +9,14 @@ public class Level : MonoBehaviour
         gameObject.SetActive(!disabled_on_start);
     }
 
+    public CameraBounds GetCameraBounds()
+    {
+        return bounds;
+    }
+
     [SerializeField]
     private bool disabled_on_start = true;
+
+    [SerializeField]
+    private CameraBounds bounds = null;
 }
