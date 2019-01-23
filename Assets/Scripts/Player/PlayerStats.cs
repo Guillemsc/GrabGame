@@ -19,6 +19,23 @@ public class PlayerStats : MonoBehaviour
         return respawning;
     }
 
+    public void SetDead(bool set)
+    {
+        dead = set;
+
+        if(dead)
+        {
+            movement.SetMovementEnabled(!dead);
+
+            movement.GetRigidBody().velocity = new Vector2(0, 0);
+        }
+    }
+
+    public bool GetDead()
+    {
+        return dead;
+    }
+
     public void SetChangingLevel(bool set)
     {
         changhing_level = set;
@@ -38,6 +55,7 @@ public class PlayerStats : MonoBehaviour
 
     private PlayerMovement movement = null;
 
+    private bool dead = false;
     private bool respawning = false;
     private bool changhing_level = false;
 
