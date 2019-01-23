@@ -12,22 +12,38 @@ public class QueueEventContext
                 ev.PushWithLastEvent();
 
             events_to_push.Add(ev);
+
+            last_pushed = ev;
+        }
+    }
+
+    public void PushEventForced(QueueEvent ev)
+    {
+        if (ev != null)
+        {
+            curr_events.Add(ev);
+
+            ev.CallOnEventStart();
+
+            ev.OnStart();
+
+            last_pushed = ev;
         }
     }
 
     public void LastPushedEventOnStart(DelQueueEvent callback)
     {
-        if (events_to_push.Count > 0)
+        if (last_pushed != null)
         {
-            events_to_push[events_to_push.Count - 1].SuscribeToOnEventStart(callback);
+            last_pushed.SuscribeToOnEventStart(callback);
         }
     }
 
     public void LastPushedEventOnFinish(DelQueueEvent callback)
     {
-        if (events_to_push.Count > 0)
+        if (last_pushed != null)
         {
-            events_to_push[events_to_push.Count - 1].SuscribeToOnEventFinish(callback);
+            last_pushed.SuscribeToOnEventFinish(callback);
         }
     }
 
@@ -94,6 +110,8 @@ public class QueueEventContext
         }
     }
 
-    List<QueueEvent> events_to_push = new List<QueueEvent>();
-    List<QueueEvent> curr_events = new List<QueueEvent>();
+    private List<QueueEvent> events_to_push = new List<QueueEvent>();
+    private List<QueueEvent> curr_events = new List<QueueEvent>();
+
+    private QueueEvent last_pushed = null;
 }

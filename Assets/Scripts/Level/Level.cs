@@ -18,5 +18,11 @@ public class Level : MonoBehaviour
     private bool disabled_on_start = true;
 
     [SerializeField]
+    private LevelConnection start = null;
+
+    [SerializeField]
+    private LevelConnection end = null;
+
+    [SerializeField]
     private CameraBounds bounds = null;
 }
