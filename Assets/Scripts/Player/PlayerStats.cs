@@ -29,6 +29,8 @@ public class PlayerStats : MonoBehaviour
                 {
                     SetDead(true);
 
+                    player_animation_controller.StrongCameraShake(0.2f);
+
                     break;
                 }
 

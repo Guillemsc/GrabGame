@@ -35,6 +35,16 @@ public class PlayerAnimationController : MonoBehaviour
         camera_follow_item.SetCameraBounds(bounds);
     }
 
+    public void SmallCameraShake(float time)
+    {
+        camera_follow_item.CameraStartShake(time, 0.05f);
+    }
+
+    public void StrongCameraShake(float time)
+    {
+        camera_follow_item.CameraStartShake(time, 0.05f);
+    }
+
     private void AnimationIdle()
     {
         if(animator != null)

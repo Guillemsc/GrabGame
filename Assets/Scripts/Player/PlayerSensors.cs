@@ -158,12 +158,14 @@ public class PlayerSensors : MonoBehaviour
             }
             else
             {
-                if (touching_platform)
+                if (standing_on_platform != null)
                 {
-                    if (on_platform_stop_touching != null)
-                        on_platform_stop_touching(standing_on_platform.gameObject);
+                    if (touching_platform)
+                    {
+                        if (on_platform_stop_touching != null)
+                            on_platform_stop_touching(standing_on_platform.gameObject);
+                    }
                 }
-
 
                 standing_on_platform = null;
 
@@ -203,6 +205,8 @@ public class PlayerSensors : MonoBehaviour
                         {
                             if (wall_script.GetCanWallJump())
                             {
+                                touching_wall = wall_script;
+
                                 found_go = wall_script.gameObject;
                                 found = true;
                             }
@@ -226,7 +230,17 @@ public class PlayerSensors : MonoBehaviour
                 touching_wall_left = true;
             }
             else
+            {
+                if(touching_wall_left)
+                {
+                    if (on_wall_stop_touching != null)
+                        on_wall_stop_touching(touching_wall.gameObject);
+
+                    touching_wall = null;
+                }
+
                 touching_wall_left = false;
+            }
         }
 
         if (player_right_pos != null)
@@ -253,6 +267,8 @@ public class PlayerSensors : MonoBehaviour
                         {
                             if (wall_script.GetCanWallJump())
                             {
+                                touching_wall = wall_script;
+
                                 found_go = wall_script.gameObject;
                                 found = true;
                             }
@@ -268,7 +284,7 @@ public class PlayerSensors : MonoBehaviour
 
             if (found)
             {
-                if(!touching_wall_right)
+                if (!touching_wall_right)
                 {
                     if (on_wall_start_touching != null)
                         on_wall_start_touching(found_go);
@@ -277,7 +293,17 @@ public class PlayerSensors : MonoBehaviour
                 touching_wall_right = true;
             }
             else
+            {
+                if (touching_wall_right)
+                {
+                    if (on_wall_stop_touching != null)
+                        on_wall_stop_touching(touching_wall.gameObject);
+
+                    touching_wall = null;
+                }
+
                 touching_wall_right = false;
+            }
         }
     }
 
@@ -328,6 +354,11 @@ public class PlayerSensors : MonoBehaviour
         on_wall_start_touching += callback;
     }
 
+    public void SuscribeToOnWallStopTouching(DelPlayerSensorGo callback)
+    {
+        on_wall_stop_touching += callback;
+    }
+
     public void SuscribeToOnPlatformStartTouching(DelPlayerSensorGo callback)
     {
         on_platform_start_touching += callback;
@@ -335,7 +366,7 @@ public class PlayerSensors : MonoBehaviour
 
     public void SuscribeToOnPlatformStopTouching(DelPlayerSensorGo callback)
     {
-        on_platform_start_touching += callback;
+        on_platform_stop_touching += callback;
     }
 
     [SerializeField]
@@ -366,8 +397,10 @@ public class PlayerSensors : MonoBehaviour
     private bool moving_on_y = false;
 
     private Platform standing_on_platform = null;
+    private Wall touching_wall = null;
 
     private DelPlayerSensorGo on_wall_start_touching = null;
+    private DelPlayerSensorGo on_wall_stop_touching = null;
     private DelPlayerSensorGo on_platform_start_touching = null;
     private DelPlayerSensorGo on_platform_stop_touching = null;
 }

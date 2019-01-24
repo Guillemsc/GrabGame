@@ -64,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
         player_sensors.SuscribeToOnPlatformStartTouching(OnPlatformStartTouching);
         player_sensors.SuscribeToOnWallStartTouching(OnWallStartTouching);
         player_sensors.SuscribeToOnPlatformStopTouching(OnPlatformStopTouching);
+        player_sensors.SuscribeToOnWallStopTouching(OnWallStopTouching);
 
         next_jump_timer.Start();
         next_jump_timer.AddTime(next_jump_min_time_sec);
@@ -343,6 +344,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnWallStartTouching(GameObject go)
     {
+        if(!player_sensors.GetTouchingPlatform())
+            gameObject.transform.parent = go.transform;
+
         if (!player_sensors.GetTouchingPlatform()
             && (!player_sensors.GetTouchingWallLeft() && !player_sensors.GetTouchingWallRight())
             && rigid_body.velocity.y < 0)
@@ -353,8 +357,16 @@ public class PlayerMovement : MonoBehaviour
         normal_jumping = false;
     }
 
+    private void OnWallStopTouching(GameObject go)
+    {
+        if(gameObject.transform.parent == go.transform)
+            gameObject.transform.parent = null;
+    }
+
     private void OnPlatformStartTouching(GameObject go)
     {
+        gameObject.transform.parent = go.transform;
+
         allow_jump_after_ground_detection_jump_timer.Start();
 
         player_state = PlayerState.PLAYER_STATE_GROUNDED;
@@ -364,6 +376,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnPlatformStopTouching(GameObject go)
     {
+        gameObject.transform.parent = null;
+
         if (platform_ignoring != null)
         {
             if (platform_ignoring.gameObject == go)

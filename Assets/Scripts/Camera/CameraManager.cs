@@ -181,7 +181,7 @@ public class CameraManager : Singleton<CameraManager>
 
         public void CameraStartShake(float shake_duration, float shake_amount)
         {
-            CameraManager.Instance.CameraStartShake(camera, shake_duration, shake_duration);
+            CameraManager.Instance.CameraStartShake(camera, shake_duration, shake_amount);
         }
 
         public void InstantFocus()
