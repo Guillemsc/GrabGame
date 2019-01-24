@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        InitEvents();
         InitRigidBody();
         InitBodyCollisions();
         InitPlayer();
@@ -33,21 +34,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void SetMovementEnabled(bool set)
+    private void InitEvents()
     {
-        movement_enabled = set;
+        EventManager.Instance.Suscribe(OnEvent);
     }
 
-    public bool GetMovementEnabled()
-    {
-        return movement_enabled;
-    }
 
     private void InitRigidBody()
     {
         rigid_body = gameObject.GetComponent<Rigidbody2D>();
 
-        if(rigid_body != null)
+        if (rigid_body != null)
         {
             rigid_body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             rigid_body.sleepMode = RigidbodySleepMode2D.NeverSleep;
@@ -73,6 +70,68 @@ public class PlayerMovement : MonoBehaviour
 
         allow_jump_after_ground_detection_jump_timer.Start();
         allow_jump_after_ground_detection_jump_timer.AddTime(allow_jump_after_ground_detection_time_sec);
+    }
+
+    private void OnEvent(Event ev)
+    {
+        switch(ev.Type())
+        {
+            case EventType.EVENT_PLAYER_DIES:
+                {
+                    SetMovementEnabled(false);
+                    ResetRigidBodyVelocity();
+                    SetKinematic();
+
+                    break;
+                }
+            case EventType.EVENT_PLAYER_REESPAWNS:
+                {
+                    SetMovementEnabled(true);
+                    ResetRigidBodyVelocity();
+                    SetDynamic();
+
+                    break;
+                }
+            case EventType.EVENT_LEVEL_END:
+                {
+                    SetMovementEnabled(false);
+                    ResetRigidBodyVelocity();
+
+                    break;
+                }
+            case EventType.EVENT_LEVEL_START:
+                {
+                    SetMovementEnabled(true);
+                    ResetRigidBodyVelocity();
+
+                    break;
+                }
+        }
+    }
+
+    public void SetMovementEnabled(bool set)
+    {
+        movement_enabled = set;
+    }
+
+    public bool GetMovementEnabled()
+    {
+        return movement_enabled;
+    }
+
+    public void ResetRigidBodyVelocity()
+    {
+        rigid_body.velocity = new Vector2(0, 0);
+    }
+
+    public void SetKinematic()
+    {
+        rigid_body.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    public void SetDynamic()
+    {
+        rigid_body.bodyType = RigidbodyType2D.Dynamic;
     }
 
     public Rigidbody2D GetRigidBody()

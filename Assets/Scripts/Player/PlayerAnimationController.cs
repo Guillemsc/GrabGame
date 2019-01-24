@@ -6,25 +6,33 @@ public class PlayerAnimationController : MonoBehaviour
 {
     private void Awake()
     {
-        animator = gameObject.GetComponentInChildren<Animator2D>();
-        player_movement = gameObject.GetComponentInParent<PlayerMovement>();
-        player_sensors = gameObject.GetComponentInParent<PlayerSensors>();
-        player_stats = gameObject.GetComponent<PlayerStats>();
+        InitPlayer();
 
         camera_follow_item = CameraManager.Instance.
             CameraFollow(CameraManager.Instance.GetUsedCamera(), gameObject, 0.2f, new Vector3(0, 0));
     }
 
-    private void Start()
-    {
-        Level curr_level = LevelManager.Instance.GetCurrLevel();
-        if(curr_level != null)
-            camera_follow_item.SetCameraBounds(curr_level.GetCameraBounds());
-    }
-
     private void Update()
     {
         SetPlayerAnimation();
+    }
+
+    private void InitPlayer()
+    {
+        animator = gameObject.GetComponentInChildren<Animator2D>();
+        player_movement = gameObject.GetComponentInParent<PlayerMovement>();
+        player_sensors = gameObject.GetComponentInParent<PlayerSensors>();
+        player_stats = gameObject.GetComponent<PlayerStats>();
+    }
+
+    public void FocusCameraOnPlayer()
+    {
+        camera_follow_item.InstantFocus();
+    }
+
+    public void SetCameraBounds(CameraBounds bounds)
+    {
+        camera_follow_item.SetCameraBounds(bounds);
     }
 
     private void AnimationIdle()

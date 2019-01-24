@@ -10,6 +10,7 @@ public class PlayerSensors : MonoBehaviour
     private void Awake()
     {
         InitRigidBody();
+        InitCollider();
     }
 
     private void Update()
@@ -23,6 +24,11 @@ public class PlayerSensors : MonoBehaviour
     private void InitRigidBody()
     {
         rigid_body = gameObject.GetComponent<Rigidbody2D>();
+    }
+
+    private void InitCollider()
+    {
+        collision_detector.SuscribeOnTriggerEnter2D(CustomOnTriggerEnter2D);
     }
 
     private void DrawDebug()
@@ -275,6 +281,18 @@ public class PlayerSensors : MonoBehaviour
         }
     }
 
+    private void CustomOnTriggerEnter2D(Collider2D coll)
+    {
+        KillSurface kill = coll.GetComponent<KillSurface>();
+
+        if(kill != null)
+        {
+            Event ev = new Event(EventType.EVENT_PLAYER_DIES);
+            ev.player_dies.player = gameObject;
+            EventManager.Instance.SendEvent(ev);
+        }
+    }
+
     public bool GetTouchingPlatform()
     {
         return touching_platform;
@@ -334,6 +352,9 @@ public class PlayerSensors : MonoBehaviour
 
     [SerializeField]
     private Collider2D body_collider = null;
+
+    [SerializeField]
+    private CollisionDetector collision_detector = null;
 
     private Rigidbody2D rigid_body = null;
 

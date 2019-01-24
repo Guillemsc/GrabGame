@@ -109,7 +109,8 @@ public class CameraManager : Singleton<CameraManager>
             if (camera == curr_item.GetCamera())
             {
                 Vector3 desired_pos = curr_item.GetDesiredPos();
-                curr_item.GetCamera().transform.position = desired_pos;
+
+                camera.transform.position = new Vector3(desired_pos.x, desired_pos.y, camera.transform.position.z);
 
                 break;
             }

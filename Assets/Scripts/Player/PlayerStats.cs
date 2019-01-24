@@ -6,12 +6,62 @@ public class PlayerStats : MonoBehaviour
 {
     private void Awake()
     {
+        InitEvents();
         InitPlayer();
     }
 
-    public void InitPlayer()
+    private void InitEvents()
     {
-        movement = gameObject.GetComponent<PlayerMovement>();
+        EventManager.Instance.Suscribe(OnEvent);
+    }
+
+    private void InitPlayer()
+    {
+        player_movement = gameObject.GetComponent<PlayerMovement>();
+        player_animation_controller = gameObject.GetComponentInChildren<PlayerAnimationController>();
+    }
+
+    private void OnEvent(Event ev)
+    {
+        switch(ev.Type())
+        {
+            case EventType.EVENT_PLAYER_DIES:
+                {
+                    SetDead(true);
+
+                    break;
+                }
+
+            case EventType.EVENT_LEVEL_LOAD:
+                {
+                    LevelConnection connection = ev.level_load.spawning_connection;
+
+                    player_animation_controller.SetCameraBounds(ev.level_load.to_load.GetCameraBounds());
+                    TeleportPlayer(connection.GetSpawnPos());
+
+                    break;
+                }
+            case EventType.EVENT_PLAYER_REESPAWNS:
+                {
+                    LevelConnection connection = LevelManager.Instance.GetLastConnectionSpawned();
+
+                    if(connection != null)
+                        TeleportPlayer(connection.GetSpawnPos());
+
+                    SetDead(false);
+
+                    break;
+                }
+        }
+    }
+
+    public void TeleportPlayer(Vector3 pos)
+    {
+        player_movement.ResetRigidBodyVelocity();
+
+        gameObject.transform.position = pos;
+
+        player_animation_controller.FocusCameraOnPlayer();
     }
 
     public bool GetRespawning()
@@ -22,13 +72,6 @@ public class PlayerStats : MonoBehaviour
     public void SetDead(bool set)
     {
         dead = set;
-
-        if(dead)
-        {
-            movement.SetMovementEnabled(!dead);
-
-            movement.GetRigidBody().velocity = new Vector2(0, 0);
-        }
     }
 
     public bool GetDead()
@@ -39,13 +82,6 @@ public class PlayerStats : MonoBehaviour
     public void SetChangingLevel(bool set)
     {
         changhing_level = set;
-
-        if (movement != null)
-        {
-            movement.SetMovementEnabled(!changhing_level);
-
-            movement.GetRigidBody().velocity = new Vector2(0, 0);
-        }
     }
 
     public bool GetChangingLevel()
@@ -53,7 +89,8 @@ public class PlayerStats : MonoBehaviour
         return changhing_level;
     }
 
-    private PlayerMovement movement = null;
+    private PlayerMovement player_movement = null;
+    private PlayerAnimationController player_animation_controller = null;
 
     private bool dead = false;
     private bool respawning = false;

@@ -14,6 +14,11 @@ public class Level : MonoBehaviour
         return bounds;
     }
 
+    public LevelConnection GetStartConnection()
+    {
+        return start;
+    }
+
     [SerializeField]
     private bool disabled_on_start = true;
 

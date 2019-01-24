@@ -20,10 +20,18 @@ public class PlayerSmoke : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        CheckWalkSmoke();
-        CheckLandSmoke();
-        CheckWallSlideSmoke();
-        CheckWallJumpSmoke();
+        if (smokes_enabled)
+        {
+            CheckWalkSmoke();
+            CheckLandSmoke();
+            CheckWallSlideSmoke();
+            CheckWallJumpSmoke();
+        }
+    }
+
+    private void InitEvents()
+    {
+        EventManager.Instance.Suscribe(OnEvent);
     }
 
     private void InitPlayer()
@@ -45,6 +53,31 @@ public class PlayerSmoke : MonoBehaviour
 
         wall_jump_smoke_timer.Start();
         wall_jump_smoke_timer.AddTime(wall_jump_smoke_min_spawn_time);
+    }
+
+    private void OnEvent(Event ev)
+    {
+        switch(ev.Type())
+        {
+            case EventType.EVENT_PLAYER_DIES:
+                {
+                    SetSmokesEnabled(false);
+
+                    break;
+                }
+
+            case EventType.EVENT_PLAYER_REESPAWNS:
+                {
+                    SetSmokesEnabled(false);
+
+                    break;
+                }
+        }
+    }
+
+    public void SetSmokesEnabled(bool set)
+    {
+        smokes_enabled = set;
     }
 
     private void CheckWalkSmoke()
@@ -235,6 +268,8 @@ public class PlayerSmoke : MonoBehaviour
         if (anim != null && mirror)
             anim.SetFilpX(true);
     }
+
+    private bool smokes_enabled = true;
 
     [SerializeField]
     private PlayerWeaponController weapon_controller = null;
