@@ -4,15 +4,39 @@ using UnityEngine;
 
 public class PlayerParenting : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        
+        InitEvents();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void InitEvents()
     {
-        
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_START_TOUCHING_PLATFORM, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_STOP_TOUCHIING_PLATFORM, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_START_TOUCHING_WALL, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_STOP_TOUCHING_WALL, OnEvent);
+    }
+
+    private void OnEvent(Event ev)
+    {
+        switch(ev.Type())
+        {
+            case EventType.EVENT_PLAYER_START_TOUCHING_PLATFORM:
+                {
+                    break;
+                }
+            case EventType.EVENT_PLAYER_STOP_TOUCHIING_PLATFORM:
+                {
+                    break;
+                }
+            case EventType.EVENT_PLAYER_START_TOUCHING_WALL:
+                {
+                    break;
+                }
+            case EventType.EVENT_PLAYER_STOP_TOUCHING_WALL:
+                {
+                    break;
+                }
+        }
     }
 }

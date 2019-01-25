@@ -199,9 +199,9 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
             
-    private void StartGrab()
+    private void StartGrab(GrabablePoint gp)
     {
-        if (shooting)
+        if (shooting && gp != null)
         {
             grabbed_point = weapon_head_rotation_point.transform.position;
             weapon_head_rotation_point.transform.parent = gameObject.transform;
@@ -219,6 +219,10 @@ public class PlayerWeaponController : MonoBehaviour
             player_movement.SetMovementEnabled(false);
 
             CameraManager.Instance.CameraStartShake(CameraManager.Instance.GetUsedCamera(), 0.05f, 0.1f);
+
+            Event ev = new Event(EventType.EVENT_PLAYER_WEAPON_START_GRAB);
+            ev.player_weapon_start_grab.grabed_point = gp.gameObject;
+            EventManager.Instance.SendEvent(ev);
 
             grabbed = true;
         }
@@ -409,7 +413,7 @@ public class PlayerWeaponController : MonoBehaviour
 
             if (gp != null)
             {
-                StartGrab();
+                StartGrab(gp);
             }
         }
     }

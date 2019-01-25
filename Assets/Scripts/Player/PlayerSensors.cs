@@ -150,8 +150,9 @@ public class PlayerSensors : MonoBehaviour
             {
                 if(!touching_platform)
                 {
-                    if (on_platform_start_touching != null)
-                        on_platform_start_touching(found_go);
+                    Event ev = new Event(EventType.EVENT_PLAYER_START_TOUCHING_PLATFORM);
+                    ev.player_start_touching_platform.platform = found_go;
+                    EventManager.Instance.SendEvent(ev);
 
                     touching_platform = true;
                 }
@@ -162,8 +163,9 @@ public class PlayerSensors : MonoBehaviour
                 {
                     if (touching_platform)
                     {
-                        if (on_platform_stop_touching != null)
-                            on_platform_stop_touching(standing_on_platform.gameObject);
+                        Event ev = new Event(EventType.EVENT_PLAYER_STOP_TOUCHIING_PLATFORM);
+                        ev.player_stop_touching_platform.platform = found_go;
+                        EventManager.Instance.SendEvent(ev);
                     }
                 }
 
@@ -223,8 +225,9 @@ public class PlayerSensors : MonoBehaviour
             {
                 if (!touching_wall_left)
                 {
-                    if (on_wall_start_touching != null)
-                        on_wall_start_touching(found_go);
+                    Event ev = new Event(EventType.EVENT_PLAYER_START_TOUCHING_WALL);
+                    ev.player_start_touching_wall.wall = found_go;
+                    EventManager.Instance.SendEvent(ev);
                 }
 
                 touching_wall_left = true;
@@ -233,8 +236,9 @@ public class PlayerSensors : MonoBehaviour
             {
                 if(touching_wall_left)
                 {
-                    if (on_wall_stop_touching != null)
-                        on_wall_stop_touching(touching_wall.gameObject);
+                    Event ev = new Event(EventType.EVENT_PLAYER_STOP_TOUCHING_WALL);
+                    ev.player_stop_touching_wall.wall = touching_wall.gameObject;
+                    EventManager.Instance.SendEvent(ev);
 
                     touching_wall = null;
                 }
@@ -286,8 +290,9 @@ public class PlayerSensors : MonoBehaviour
             {
                 if (!touching_wall_right)
                 {
-                    if (on_wall_start_touching != null)
-                        on_wall_start_touching(found_go);
+                    Event ev = new Event(EventType.EVENT_PLAYER_START_TOUCHING_WALL);
+                    ev.player_start_touching_wall.wall = found_go;
+                    EventManager.Instance.SendEvent(ev);
                 }
 
                 touching_wall_right = true;
@@ -296,8 +301,9 @@ public class PlayerSensors : MonoBehaviour
             {
                 if (touching_wall_right)
                 {
-                    if (on_wall_stop_touching != null)
-                        on_wall_stop_touching(touching_wall.gameObject);
+                    Event ev = new Event(EventType.EVENT_PLAYER_STOP_TOUCHING_WALL);
+                    ev.player_stop_touching_wall.wall = touching_wall.gameObject;
+                    EventManager.Instance.SendEvent(ev);
 
                     touching_wall = null;
                 }
@@ -349,26 +355,6 @@ public class PlayerSensors : MonoBehaviour
         return body_collider;
     }
 
-    public void SuscribeToOnWallStartTouching(DelPlayerSensorGo callback)
-    {
-        on_wall_start_touching += callback;
-    }
-
-    public void SuscribeToOnWallStopTouching(DelPlayerSensorGo callback)
-    {
-        on_wall_stop_touching += callback;
-    }
-
-    public void SuscribeToOnPlatformStartTouching(DelPlayerSensorGo callback)
-    {
-        on_platform_start_touching += callback;
-    }
-
-    public void SuscribeToOnPlatformStopTouching(DelPlayerSensorGo callback)
-    {
-        on_platform_stop_touching += callback;
-    }
-
     [SerializeField]
     private GameObject[] player_foot_pos = null;
 
@@ -398,9 +384,4 @@ public class PlayerSensors : MonoBehaviour
 
     private Platform standing_on_platform = null;
     private Wall touching_wall = null;
-
-    private DelPlayerSensorGo on_wall_start_touching = null;
-    private DelPlayerSensorGo on_wall_stop_touching = null;
-    private DelPlayerSensorGo on_platform_start_touching = null;
-    private DelPlayerSensorGo on_platform_stop_touching = null;
 }

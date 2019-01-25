@@ -36,6 +36,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void InitEvents()
     {
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_START_TOUCHING_PLATFORM, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_STOP_TOUCHIING_PLATFORM, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_START_TOUCHING_WALL, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_STOP_TOUCHING_WALL, OnEvent);
+
         EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_DIES, OnEvent);
         EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_REESPAWNS, OnEvent);
         EventManager.Instance.Suscribe(EventType.EVENT_LEVEL_END, OnEvent);
@@ -64,10 +69,6 @@ public class PlayerMovement : MonoBehaviour
         player_state = PlayerState.PLAYER_STATE_GROUNDED;
 
         player_sensors = gameObject.GetComponent<PlayerSensors>();
-        player_sensors.SuscribeToOnPlatformStartTouching(OnPlatformStartTouching);
-        player_sensors.SuscribeToOnWallStartTouching(OnWallStartTouching);
-        player_sensors.SuscribeToOnPlatformStopTouching(OnPlatformStopTouching);
-        player_sensors.SuscribeToOnWallStopTouching(OnWallStopTouching);
 
         next_jump_timer.Start();
         next_jump_timer.AddTime(next_jump_min_time_sec);
@@ -80,6 +81,34 @@ public class PlayerMovement : MonoBehaviour
     {
         switch(ev.Type())
         {
+            case EventType.EVENT_PLAYER_START_TOUCHING_PLATFORM:
+                {
+                    OnPlatformStartTouching(ev.player_start_touching_platform.platform);
+
+                    break;
+                }
+
+            case EventType.EVENT_PLAYER_STOP_TOUCHIING_PLATFORM:
+                {
+                    OnPlatformStopTouching(ev.player_stop_touching_platform.platform);
+
+                    break;
+                }
+
+            case EventType.EVENT_PLAYER_START_TOUCHING_WALL:
+                {
+                    OnWallStartTouching(ev.player_start_touching_wall.wall);
+
+                    break;
+                }
+
+            case EventType.EVENT_PLAYER_STOP_TOUCHING_WALL:
+                {
+                    OnWallStopTouching(ev.player_stop_touching_wall.wall);
+
+                    break;
+                }
+
             case EventType.EVENT_PLAYER_DIES:
                 {
                     SetMovementEnabled(false);

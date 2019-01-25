@@ -69,7 +69,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         if (level != null)
         {
-            Event ev = new Event(EventType.EVEN_LEVEL_UNLOAD);
+            Event ev = new Event(EventType.EVENT_LEVEL_UNLOAD);
             ev.level_unload.to_unload = level;
             EventManager.Instance.SendEvent(ev);
 
