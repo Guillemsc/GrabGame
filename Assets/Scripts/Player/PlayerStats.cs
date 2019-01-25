@@ -12,7 +12,9 @@ public class PlayerStats : MonoBehaviour
 
     private void InitEvents()
     {
-        EventManager.Instance.Suscribe(OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_DIES, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_LEVEL_LOAD, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_REESPAWNS, OnEvent);
     }
 
     private void InitPlayer()

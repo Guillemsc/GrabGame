@@ -14,36 +14,39 @@ public class EventManager : Singleton<EventManager>
     {
         if (ev != null)
         {
-            if (OnEvent != null)
-                OnEvent(ev);
-        }
-    }
-
-    public void Suscribe(OnEventDel del)
-    {
-        bool found = false;
-
-        if (OnEvent != null)
-        {
-            foreach (Delegate d in OnEvent.GetInvocationList())
+            if (event_delegates.ContainsKey(ev.Type()))
             {
-                if ((OnEventDel)d == del)
-                {
-                    found = true;
-                    break;
-                }
+                OnEventDel del = event_delegates[ev.Type()];
+
+                if (del != null)
+                    del(ev);
             }
         }
-
-        if (!found)
-            OnEvent += del;
     }
 
-    public void UnSuscribe(OnEventDel del)
+    public void Suscribe(EventType type, OnEventDel callback)
     {
-        OnEvent -= del;
+        if (event_delegates.ContainsKey(type))
+        {
+             event_delegates[type] += callback;
+        }
+        else
+        {
+            OnEventDel del = null;
+            del += callback;
+            event_delegates.Add(type, del);
+        }
+    }
+
+    public void UnSuscribe(OnEventDel del, EventType type)
+    {
+        if (event_delegates.ContainsKey(type))
+        {
+            event_delegates[type] -= del;
+        }
     }
 
     public delegate void OnEventDel(Event ev);
-    private event OnEventDel OnEvent = null;
+
+    Dictionary<EventType, OnEventDel> event_delegates = new Dictionary<EventType, OnEventDel>();
 }

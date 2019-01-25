@@ -31,7 +31,8 @@ public class PlayerSmoke : MonoBehaviour
 
     private void InitEvents()
     {
-        EventManager.Instance.Suscribe(OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_DIES, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_REESPAWNS, OnEvent);
     }
 
     private void InitPlayer()

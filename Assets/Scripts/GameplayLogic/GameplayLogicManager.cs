@@ -21,7 +21,7 @@ public class GameplayLogicManager : Singleton<GameplayLogicManager>
 
     private void InitEvents()
     {
-        EventManager.Instance.Suscribe(OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_DIES, OnEvent);
     }
 
     private void OnEvent(Event ev)

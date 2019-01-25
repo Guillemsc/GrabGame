@@ -36,7 +36,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void InitEvents()
     {
-        EventManager.Instance.Suscribe(OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_DIES, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_PLAYER_REESPAWNS, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_LEVEL_END, OnEvent);
+        EventManager.Instance.Suscribe(EventType.EVENT_LEVEL_START, OnEvent);
     }
 
 
